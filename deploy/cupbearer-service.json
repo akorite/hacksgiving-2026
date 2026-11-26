@@ -1,0 +1,15 @@
+{
+  "sprite": "cupbearer",
+  "service": {
+    "command": "uvicorn cupbearer.server:create_app --factory --host 0.0.0.0 --port 8080",
+    "port": 8080,
+    "public": true
+  },
+  "budget": {
+    "max_sprites": 2,
+    "persistent": ["cupbearer"],
+    "ephemeral": ["cupbearer-airlock"]
+  },
+  "network_policy_default": {"rules": [{"domain": "*", "action": "deny"}]},
+  "secret_policy": "provider credentials exist only in the Sprites Connectors Gateway, never in either Sprite"
+}
