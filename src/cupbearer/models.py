@@ -124,6 +124,7 @@ class ForensicBundle(BaseModel):
     prompt_injection_hits: list[str] = Field(default_factory=list)
     analyzer_stdout: str = ""
     analyzer_stderr: str = ""
+    sanitized_pdf_path: str | None = None
     timed_out: bool = False
     error: str | None = None
 
