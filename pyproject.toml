@@ -23,7 +23,6 @@ dev = ["pytest>=8,<9", "pytest-asyncio>=0.23,<1", "ruff>=0.6,<1"]
 
 [project.scripts]
 cupbearer-airlock = "cupbearer.airlock.cli:main"
-cupbearer-setup = "deploy.setup_sprites:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cupbearer"]
