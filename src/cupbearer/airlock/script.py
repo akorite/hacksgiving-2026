@@ -55,7 +55,7 @@ def analyze_script(path: Path, outdir: Path, artifact: Artifact, timeout: int = 
             bundle.events.append(ExecEvent(type="signal", name="timeout", detail={"seconds": timeout}))
         observable = bundle.analyzer_stdout + "\n" + bundle.analyzer_stderr
         try:
-            observable += "\n" + "\n".join(p.read_text(errors="ignore")[:20000] for p in root.rglob("*") if p.is_file() and p.stat().st_size < 20000)
+            observable += "\n" + "\n".join(p.read_text(errors="ignore")[:20000] for p in root.rglob("*") if p.is_file() and "canary" not in p.parts and p.stat().st_size < 20000)
         except Exception:
             pass
         bundle.canary_hits = scan_canaries(observable, canaries)

@@ -61,7 +61,7 @@ def test_script_detonation_times_out(tmp_path):
 
 def test_script_detonation_catches_canary_exfiltration(tmp_path):
     payload = tmp_path / "steal.py"
-    payload.write_text("from pathlib import Path\nprint(Path('canary/credentials.txt').read_text())\nimport socket\n")
+    payload.write_text("from pathlib import Path\nprint(Path('canary/credentials.txt').read_text())\nimport socket\nsocket.socket()\n")
     bundle = analyze_script(payload, tmp_path / "out", art(payload, ArtifactKind.SCRIPT), timeout=3)
     assert bundle.canary_hits
     assert bundle.network.attempted is True
