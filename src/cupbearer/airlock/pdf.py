@@ -20,7 +20,7 @@ INJECTION_PATTERNS = [
 
 def extract_invoice_fields(text: str) -> ExtractedFields:
     def search(pattern: str) -> str | None:
-        m = re.search(pattern, text, re.I)
+        m = re.search(pattern, text, re.IGNORECASE)
         return m.group(1).strip() if m else None
 
     email = search(r"(?:from|sender|email)\s*[:\-]?\s*([^\s<>]+@[^\s<>]+)")
@@ -95,7 +95,7 @@ def analyze_pdf(path: Path, outdir: Path, artifact: Artifact) -> ForensicBundle:
         bundle.events.append(ExecEvent(type="file", name="pdf-render", detail={"pages": len(bundle.rendered_pages)}))
         bundle.sanitized_pdf_path = str(sanitize_pdf(path, outdir))
         (outdir / "bundle-text.txt").write_text(text, encoding="utf-8")
-    except Exception as exc:  # corrupted PDFs are evidence, not a crash of the Airlock
+    except (fitz.FileDataError, OSError, ValueError, RuntimeError) as exc:  # corrupted PDFs are evidence, not a crash of the Airlock
         bundle.error = f"pdf-analysis-failed: {exc}"
         bundle.events.append(ExecEvent(type="file", name="pdf-error", detail={"error": str(exc)}))
     return bundle

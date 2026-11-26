@@ -44,7 +44,7 @@ def analyze_script(path: Path, outdir: Path, artifact: Artifact, timeout: int = 
             shutil.copy2(path, target)
         bundle.events.append(ExecEvent(type="process", name="spawn", detail={"argv": command_for(target)}))
         try:
-            proc = subprocess.run(command_for(target), cwd=root, capture_output=True, text=True, timeout=timeout, shell=False)
+            proc = subprocess.run(command_for(target), check=False, cwd=root, capture_output=True, text=True, timeout=timeout, shell=False)
             bundle.analyzer_stdout = proc.stdout[-8000:]
             bundle.analyzer_stderr = proc.stderr[-8000:]
             bundle.events.append(ExecEvent(type="process", name="exit", detail={"returncode": proc.returncode, "duration_ms": int((time.monotonic() - started) * 1000)}))
@@ -56,8 +56,8 @@ def analyze_script(path: Path, outdir: Path, artifact: Artifact, timeout: int = 
         observable = bundle.analyzer_stdout + "\n" + bundle.analyzer_stderr
         try:
             observable += "\n" + "\n".join(p.read_text(errors="ignore")[:20000] for p in root.rglob("*") if p.is_file() and "canary" not in p.parts and p.stat().st_size < 20000)
-        except Exception:
-            pass
+        except (OSError, UnicodeError):
+            bundle.events.append(ExecEvent(type="file", name="source-scan-unavailable"))
         bundle.canary_hits = scan_canaries(observable, canaries)
         markers = [m for m in NETWORK_MARKERS if m in observable]
         hosts = sorted({c.value for c in canaries if c.kind in {"beacon_url", "dns_host"} and c.value in observable})

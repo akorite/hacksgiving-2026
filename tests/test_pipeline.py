@@ -2,7 +2,14 @@ import pytest
 
 from cupbearer.box_watcher import BoxWatcher
 from cupbearer.connectors.airlock_client import LocalAirlockClient
-from cupbearer.models import Artifact, ArtifactKind, ArtifactSource, ForensicBundle, TrustBaseline, VerdictType
+from cupbearer.models import (
+    Artifact,
+    ArtifactKind,
+    ArtifactSource,
+    ForensicBundle,
+    TrustBaseline,
+    VerdictType,
+)
 from cupbearer.pipeline import InspectionPipeline
 from cupbearer.store import Store
 from cupbearer.verdict import deterministic_verdict

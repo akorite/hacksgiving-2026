@@ -3,7 +3,7 @@ from pathlib import Path
 
 import fitz
 
-from cupbearer.airlock.cli import main as cli_main, run_detonation
+from cupbearer.airlock.cli import main as cli_main
 from cupbearer.airlock.link import analyze_link
 from cupbearer.airlock.pdf import analyze_pdf, image_diff_regions
 from cupbearer.airlock.script import analyze_script

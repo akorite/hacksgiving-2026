@@ -5,7 +5,6 @@ import json
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import urlencode
 
 from ..airlock.cli import run_detonation
 from ..airlock.link import is_public_http_url

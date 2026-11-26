@@ -3,10 +3,14 @@ import json
 import httpx
 import pytest
 
-from cupbearer.connectors.airlock_client import DENY_ALL_POLICY, SpritesAirlockClient, parse_exec_frames
+from cupbearer.connectors.airlock_client import (
+    DENY_ALL_POLICY,
+    SpritesAirlockClient,
+    parse_exec_frames,
+)
 from cupbearer.connectors.box_client import BoxClient
 from cupbearer.connectors.gateway import GatewayClient, validate_gateway_path
-from cupbearer.connectors.llm_client import LLMClient, extract_json
+from cupbearer.connectors.llm_client import LLMError, extract_json
 from cupbearer.connectors.telegram_client import TelegramClient
 from cupbearer.models import ArtifactKind
 
@@ -76,7 +80,7 @@ async def test_box_rejects_unsafe_redirect_and_multipart_orders_attributes_first
 
 def test_llm_extracts_json_and_rejects_non_json():
     assert extract_json('prefix {"answer":"yes"} suffix') == {"answer": "yes"}
-    with pytest.raises(Exception):
+    with pytest.raises(LLMError):
         extract_json("no json")
 
 

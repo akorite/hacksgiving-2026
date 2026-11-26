@@ -39,7 +39,7 @@ class BoxWatcher:
             try:
                 await asyncio.wait_for(self._wake.wait(), timeout=self.interval)
                 self._wake.clear()
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
     async def stop(self) -> None:

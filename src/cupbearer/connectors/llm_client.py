@@ -14,7 +14,7 @@ def extract_json(text: str) -> dict:
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", text, re.S)
+        m = re.search(r"\{.*\}", text, re.DOTALL)
         if not m:
             raise LLMError("LLM response did not contain JSON")
         try:

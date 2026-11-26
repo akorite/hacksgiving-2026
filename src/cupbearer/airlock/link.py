@@ -60,7 +60,7 @@ def analyze_link(url: str, outdir: Path, artifact: Artifact, timeout: int = 25, 
                 break
             else:
                 bundle.error = "redirect-limit-exceeded"
-    except Exception as exc:
+    except (httpx.HTTPError, OSError, ValueError) as exc:
         bundle.error = f"link-analysis-failed: {exc}"
     (outdir / "redirect-chain.txt").write_text("\n".join(chain), encoding="utf-8")
     return bundle

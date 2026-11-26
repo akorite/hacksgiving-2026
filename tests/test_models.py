@@ -5,7 +5,14 @@ from pydantic import ValidationError
 
 from cupbearer.canaries import new_canaries, plant_canaries, scan_canaries
 from cupbearer.config import Settings
-from cupbearer.models import Artifact, ArtifactKind, ArtifactSource, ForensicBundle, Verdict, VerdictType
+from cupbearer.models import (
+    Artifact,
+    ArtifactKind,
+    ArtifactSource,
+    ForensicBundle,
+    Verdict,
+    VerdictType,
+)
 
 
 def artifact() -> Artifact:

@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .annotator import annotate_xray
 from .connectors.llm_client import LLMError
-from .models import Artifact, ArtifactKind, ArtifactSource, ChatEntry, Inspection, InspectionStatus, TrustBaseline, VerdictType
+from .models import (
+    Artifact,
+    ArtifactKind,
+    ArtifactSource,
+    ChatEntry,
+    Inspection,
+    InspectionStatus,
+    TrustBaseline,
+    VerdictType,
+)
 from .store import Store
 from .verdict import deterministic_verdict
 
@@ -42,7 +51,7 @@ class InspectionPipeline:
         inspection.annotated_png_path = str(annotate_xray(bundle, verdict.verdict, outdir / "xray.png"))
         if bundle.sanitized_pdf_path:
             inspection.sanitized_pdf_path = bundle.sanitized_pdf_path
-        inspection.updated_at = datetime.now(timezone.utc)
+        inspection.updated_at = datetime.now(UTC)
         return self.store.save(inspection)
 
     async def trust_baseline_for(self, vendor_name: str | None) -> TrustBaseline | None:
@@ -50,14 +59,14 @@ class InspectionPipeline:
             return None
         try:
             hits = await self.pinecone.search("trust-baseline", vendor_name, top_k=1)
-        except Exception:
+        except (RuntimeError, ValueError, KeyError, TypeError):
             return None
         if not hits:
             return None
         fields = hits[0].get("fields", hits[0])
         try:
             return TrustBaseline(vendor_name=fields.get("vendor_name") or vendor_name, sender_email=fields.get("sender_email"), bank_account=fields.get("bank_account"), routing_number=fields.get("routing_number"), payment_domain=fields.get("payment_domain"))
-        except Exception:
+        except (RuntimeError, ValueError, KeyError, TypeError):
             return None
 
     async def answer(self, inspection_id: str, question: str) -> str:
@@ -70,19 +79,19 @@ class InspectionPipeline:
             except LLMError:
                 answer = "LLM synthesis is degraded; use the deterministic evidence shown in the X-Ray."
         inspection.chat.append(ChatEntry(role="assistant", text=answer))
-        inspection.updated_at = datetime.now(timezone.utc); self.store.save(inspection)
+        inspection.updated_at = datetime.now(UTC); self.store.save(inspection)
         return answer
 
     async def approve(self, inspection_id: str) -> Inspection:
         inspection = self.require(inspection_id)
         if inspection.verdict and inspection.verdict.verdict == VerdictType.MALICIOUS:
             raise ValueError("malicious artifacts cannot be promoted")
-        inspection.status = InspectionStatus.VERIFIED; inspection.updated_at = datetime.now(timezone.utc)
+        inspection.status = InspectionStatus.VERIFIED; inspection.updated_at = datetime.now(UTC)
         return self.store.save(inspection)
 
     async def discard(self, inspection_id: str) -> Inspection:
         inspection = self.require(inspection_id)
-        inspection.status = InspectionStatus.DISCARDED; inspection.updated_at = datetime.now(timezone.utc)
+        inspection.status = InspectionStatus.DISCARDED; inspection.updated_at = datetime.now(UTC)
         return self.store.save(inspection)
 
     def require(self, inspection_id: str) -> Inspection:
